@@ -39,7 +39,7 @@
         <label class="label">Dirección</label>
         <input v-model="form.address" class="input" placeholder="Calle, colonia, ciudad, CP" />
       </div>
-      <div class="sm:col-span-2">
+      <div v-if="can('patients:observations')" class="sm:col-span-2">
         <label class="label">Observaciones</label>
         <textarea v-model="form.observations" class="input h-20 resize-none" placeholder="Antecedentes, alergias, notas..." />
       </div>
@@ -55,11 +55,13 @@
 
 <script setup lang="ts">
 import { usePatientsStore, type Patient } from "~/stores/patients";
+import { useRBAC } from "~/composables/useRBAC";
 
 const props = defineProps<{ modelValue: boolean; patient?: Patient | null }>();
 const emit  = defineEmits(["update:modelValue", "saved"]);
 
 const store  = usePatientsStore();
+const { can } = useRBAC();
 const saving = ref(false);
 const errors = reactive<Record<string, string>>({});
 

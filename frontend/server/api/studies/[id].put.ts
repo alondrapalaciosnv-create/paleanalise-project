@@ -22,6 +22,12 @@ export default defineEventHandler(async (event) => {
   }
   const data = parsed.data;
 
+  // El capturista no puede cambiar el tipo de lesión ni los comentarios clínicos
+  if (auth.role === "CAPTURISTA") {
+    delete data.lesionType;
+    delete data.clinicalComments;
+  }
+
   const exists = await prisma.study.findFirst({ where: { id, deletedAt: null }, select: { id: true } });
   if (!exists) throw createError({ statusCode: 404, message: "Estudio no encontrado" });
 

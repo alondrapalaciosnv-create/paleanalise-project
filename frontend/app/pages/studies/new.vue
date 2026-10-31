@@ -28,21 +28,21 @@
           </p>
         </div>
 
-        <div>
+        <div v-if="can('studies:clinical')">
           <label class="label">Tipo de lesión</label>
           <select v-model="form.lesionType" class="input">
             <option v-for="t in lesionTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
           </select>
         </div>
-        <div>
+        <div :class="{ 'sm:col-span-2': !can('studies:clinical') }">
           <label class="label">Fecha del estudio</label>
           <input v-model="form.studyDate" type="date" class="input" />
         </div>
         <div class="sm:col-span-2">
-          <label class="label">Localización anatómica *</label>
+          <label class="label">Lugar de la lesión (localización anatómica) *</label>
           <input v-model="form.anatomicLocation" class="input" placeholder="Espalda, brazo derecho..." required minlength="2" maxlength="200" />
         </div>
-        <div class="sm:col-span-2">
+        <div v-if="can('studies:clinical')" class="sm:col-span-2">
           <label class="label">Comentarios clínicos</label>
           <textarea v-model="form.clinicalComments" class="input h-24 resize-none" maxlength="2000" placeholder="Evolución, síntomas, antecedentes..." />
         </div>
@@ -68,6 +68,7 @@
 import { useDebounceFn } from "@vueuse/core";
 import { useNotification } from "~/composables/useNotification";
 import { useAuthStore } from "~/stores/auth";
+import { useRBAC } from "~/composables/useRBAC";
 import type { Patient } from "~/stores/patients";
 
 definePageMeta({ title: "Nuevo estudio", middleware: "auth" });
@@ -75,6 +76,7 @@ definePageMeta({ title: "Nuevo estudio", middleware: "auth" });
 const route  = useRoute();
 const notif  = useNotification();
 const auth   = useAuthStore();
+const { can } = useRBAC();
 
 const lesionTypes = LESION_TYPES;   // app/utils/lesionTypes.ts (compartido con el formulario de edición)
 

@@ -29,6 +29,9 @@ export default defineEventHandler(async (event) => {
   }
   const data = parsed.data;
 
+  // El capturista solo registra los datos básicos: las observaciones son del personal médico
+  if (auth.role === "CAPTURISTA") delete data.observations;
+
   try {
     const patient = await prisma.patient.create({
       data: { ...data, birthDate: new Date(data.birthDate), email: data.email || null },

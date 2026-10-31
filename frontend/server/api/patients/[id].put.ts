@@ -29,6 +29,9 @@ export default defineEventHandler(async (event) => {
   }
   const data = parsed.data;
 
+  // El capturista no puede escribir ni modificar las observaciones
+  if (auth.role === "CAPTURISTA") delete data.observations;
+
   const update: Record<string, unknown> = { ...data };
   if (data.birthDate) update.birthDate = new Date(data.birthDate);
   if (data.email === "") update.email = null;

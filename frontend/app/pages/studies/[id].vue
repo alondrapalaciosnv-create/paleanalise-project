@@ -21,7 +21,7 @@
       <div class="flex flex-wrap items-center gap-3">
         <UiBadgeRisk :risk="study.riskLevel" />
         <button
-          v-if="!study.analysis"
+          v-if="!study.analysis && can('analysis:run')"
           class="btn-primary"
           :disabled="analyzing"
           @click="runAnalysis"
@@ -35,7 +35,7 @@
           </svg>
           {{ analyzing ? 'Analizando...' : 'Analizar con IA' }}
         </button>
-        <button v-else type="button" class="btn-secondary" :disabled="downloading === study.id" @click="download(study.id)">
+        <button v-else-if="study.analysis && can('reports:export')" type="button" class="btn-secondary" :disabled="downloading === study.id" @click="download(study.id)">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
@@ -169,7 +169,9 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
             <p class="font-medium text-gray-500">Sin análisis de IA</p>
-            <p class="text-sm text-gray-400 mt-1">Sube una imagen y ejecuta el análisis</p>
+            <p class="text-sm text-gray-400 mt-1">
+              {{ can('analysis:run') ? 'Sube una imagen y ejecuta el análisis' : 'Pendiente: el análisis lo ejecuta el médico' }}
+            </p>
           </div>
         </div>
 

@@ -10,13 +10,13 @@
         <p class="text-xs text-gray-400">Paciente</p>
         <p class="text-sm font-medium text-gray-800">{{ patientName }}</p>
       </div>
-      <div>
+      <div v-if="can('studies:clinical')">
         <label class="label">Tipo de lesión</label>
         <select v-model="form.lesionType" class="input">
           <option v-for="t in LESION_TYPES" :key="t.value" :value="t.value">{{ t.label }}</option>
         </select>
       </div>
-      <div>
+      <div :class="{ 'sm:col-span-2': !can('studies:clinical') }">
         <label class="label">Fecha del estudio</label>
         <input v-model="form.studyDate" type="date" class="input" required />
       </div>
@@ -24,7 +24,7 @@
         <label class="label">Localización anatómica *</label>
         <input v-model="form.anatomicLocation" class="input" required minlength="2" maxlength="200" placeholder="Espalda, brazo derecho..." />
       </div>
-      <div class="sm:col-span-2">
+      <div v-if="can('studies:clinical')" class="sm:col-span-2">
         <label class="label">Comentarios clínicos</label>
         <textarea v-model="form.clinicalComments" class="input h-28 resize-none" maxlength="2000" placeholder="Evolución, síntomas, antecedentes..." />
       </div>
@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { useApiFetch } from "~/composables/useApiFetch";
 import { useNotification } from "~/composables/useNotification";
+import { useRBAC } from "~/composables/useRBAC";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -50,6 +51,7 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: "update:modelValue", v: boolean): void; (e: "saved"): void }>();
 
 const notif  = useNotification();
+const { can } = useRBAC();
 const saving = ref(false);
 const error  = ref("");
 
@@ -89,9 +91,12 @@ async function save() {
     await useApiFetch(`/api/studies/${props.study.id}`, {
       method: "PUT",
       body: JSON.stringify({
-        lesionType:       form.lesionType,
+        // Solo ADMIN/DOCTOR envían tipo de lesión y comentarios (el servidor también los ignora para el capturista)
+        ...(can("studies:clinical") && {
+          lesionType:       form.lesionType,
+          clinicalComments: form.clinicalComments,
+        }),
         anatomicLocation: form.anatomicLocation.trim(),
-        clinicalComments: form.clinicalComments,
         studyDate:        form.studyDate,
       }) as unknown as BodyInit,
     });

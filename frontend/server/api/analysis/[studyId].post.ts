@@ -1,10 +1,11 @@
 import { prisma } from "../../utils/prisma";
-import { getAuthUser } from "../../utils/rbac";
+import { getAuthUser, requireRoles } from "../../utils/rbac";
 import { auditLog } from "../../utils/audit";
 import { absoluteImageUrl } from "../../utils/storage";
 import { aiHeaders } from "../../utils/ai";
 
 export default defineEventHandler(async (event) => {
+  requireRoles(event, "ADMIN", "DOCTOR");   // el capturista solo registra; no ejecuta la IA
   const auth    = getAuthUser(event);
   const studyId = getRouterParam(event, "studyId")!;
   const config  = useRuntimeConfig();

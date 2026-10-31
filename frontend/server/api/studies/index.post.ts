@@ -17,6 +17,12 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const data = schema.parse(body);
 
+  // El capturista solo registra paciente, fecha, lugar e imagen: sin tipo de lesión ni comentarios clínicos
+  if (auth.role === "CAPTURISTA") {
+    data.lesionType       = "OTRO";
+    data.clinicalComments = undefined;
+  }
+
   const study = await prisma.study.create({
     data: {
       ...data,

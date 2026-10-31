@@ -161,7 +161,7 @@
               <td class="text-right">
                 <NuxtLink :to="`/studies/${s.id}`"
                   class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-                  {{ s.isProcessed ? 'Ver análisis' : 'Analizar' }}
+                  {{ s.isProcessed ? 'Ver análisis' : (can('analysis:run') ? 'Analizar' : 'Ver estudio') }}
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                   </svg>
@@ -185,8 +185,11 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { useApiFetch }   from '~/composables/useApiFetch'
+import { useRBAC }       from '~/composables/useRBAC'
 
 definePageMeta({ title: 'Análisis IA', middleware: 'auth' })
+
+const { can } = useRBAC()
 
 type Prediction = { probability: number; probBenigno: number; probSospechoso: number; probMaligno: number }
 type Abcde      = { totalScore: number }
